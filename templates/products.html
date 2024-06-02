@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<body style="background-color: lightgray;">
+  
+<div style="margin-top: 3%;" >
+  
+
+  <div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+    tabindex="-1" >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Add New Product</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="background-color: #051922;">
+          <form action="/add_prods" method="post">
+
+            <input type="text" name="name" style="width: 200px;margin-left: 10%; height: 35px;border-color: #ef8024;"
+              placeholder="Product Name" required><br>
+            <input type="number" name="buying" placeholder="Buying Price(Ksh.)"
+              style="width: 200px; margin-left: 10%;margin-top: 3%; border-color: #ef8024;" re>
+            <input type="number" name="selling" placeholder="Selling Price(Ksh.)"
+              style="width: 200px;border-color: #ef8024;" required>
+            <input type="number" name="stock" placeholder="Stock Quantity"
+              style="width: 200px; margin-left: 10%;border-color: #ef8024;" required><br>
+            <button type="submit" class="btn btn-primary"
+              style="margin-top:4%; margin-left: 75%;background-color:lightgrey; color:#ef8024; border-color: #ef8024;font-weight: bolder;">Add
+              Product</button>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+
+          <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Update Existing
+            Product</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
+    tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Update Products</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="background-color: #051922;">
+          <form action="/update_prods" method="post">
+            <select class="form-select" aria-label="Default select example"
+              style="width: 55%;margin-left: 22%;border-color: #ef8024;" name="select">
+              <option style="color: #051922;">Select Product</option>
+              {% for i in products%}
+              <option value="{{i[1]}}">{{i[1]}}</option>
+              {% endfor %}
+
+            </select>
+
+            <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline"
+              style="width: 40%;margin-left: 30%;margin-top:4%;border-color: #ef8024;" placeholder="Buying Price"
+              name="buying">
+            <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline"
+              style="width: 40%;margin-left: 30%;margin-top: 4%;border-color: #ef8024;" placeholder="Selling Price"
+              name="selling">
+            <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline"
+              style="width: 40%;margin-left: 30%;margin-top: 4%;border-color: #ef8024;" placeholder="Stock Quantity"
+              name="stock">
+            <button type="submit" class="btn btn-primary"
+              style="margin-left: 70%;margin-top: 6%;background-color: white;color: #ef8024;font-weight: bolder;">Update
+              Product</button>
+
+          </form>
+
+        </div>
+        <div class="modal-footer">
+
+          <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal"
+            style="background-color: #051922;">Go back</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal"
+    style="background-color:burlywood;color: #ef8024;font-weight: bolder;border-color:white;margin-left: 4%;">Add Products</button>
+
+  <div>
+    <table class="table" id="dt_t" style="width: 78%;margin-left: 10%;border-color: #051922;" border="1">
+      <thead style="background-color: #051922;" >
+        <tr style="text-align: center;" >
+          <th scope="col" style="text-align: center;color: #ef8024;background-color: #384B56;">ID</th>
+          <th scope="col" style="text-align: center;color: #ef8024;background-color: #384B56;">Product</th>
+          <th scope="col" style="text-align: center;color: #ef8024;background-color: #384B56;">Buying_Price(KSH.)</th>
+          <th scope="col" style="text-align: center;color: #ef8024;background-color: #384B56;">Selling_Price(KSH.)</th>
+          <th scope="col" style="text-align: center;color: #ef8024;background-color: #384B56;">Stock_Quantity</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {%for i in products%}
+        <tr >
+
+          <td style="text-align: center;font-weight: bolder;">{{i[0]}}</td>
+          <td style="text-align: center;font-weight: bolder;">{{i[1]}}</td>
+          <td style="text-align: center;font-weight: bolder;">{{i[2]}}</td>
+          <td style="text-align: center;font-weight: bolder;">{{i[3]}}</td>
+          <td style="text-align: center;font-weight: bolder;">{{i[4]}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+</div>
+</body>
+
+{% endblock %}
