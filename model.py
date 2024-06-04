@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 
-app=Flask(__name__)
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:6979@localhost/letting'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -17,6 +17,8 @@ class Product(db.Model):
     selling_price = db.Column(db.Integer,nullable=False)
     stock_quantity = db.Column(db.Integer,nullable=False)
     sales = db.relationship('Sale',backref='product')
+    def __repr__(self):
+        return f'<PRODUCTS %r> % id = {self.id} ,name = {self.name}, buying_price = {self.buying_price},selling_price = {self.selling_price},stock_quantity = {self.stock_quantity}'
 
 class Sale(db.Model):
     __tablename__= 'sales'
@@ -36,4 +38,6 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
-app.run(debug=True)
+    products = Product.query.all()
+    # print(products)
+# app.run(debug=True)

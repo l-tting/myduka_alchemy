@@ -18,12 +18,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                
                     <form action="/make_sale" method="post">
                         <select class="form-select" aria-label="Default select example"
-                            style="width: 50%;margin-left:25%;color: #051922;font-weight: bolder;border-color: #ef8024;" name="select">
+                            style="width: 50%;margin-left:25%;color: #051922;font-weight: bolder;border-color: #ef8024;" name="select_prod">
                             <option>Select Product</option>
-                            {% for i in products %}
-                            <option value={{i[0]}}>{{i[1]}}</option>
+                            {% for product in products %}
+                            <option value="{{product.id}}">{{product.name}}</option>
                             {% endfor %}
                         </select>
                         <input type="number" id="inputPassword6" class="form-control"
@@ -58,12 +59,12 @@
             </tr>
         </thead>
         <tbody>
-            {% for i in sales%}
+            {% for sale in sales%}
             <tr>
-                <td style="text-align: center;font-weight: bolder;">{{i[0]}}</td>
-                <td style="text-align: center;font-weight: bolder;">{{i[1]}}</td>
-                <td style="text-align: center;font-weight: bolder;">{{i[2]}}</td>
-                <td style="text-align: center;font-weight: bolder;">{{i[3]}}</td>
+                <td style="text-align: center;font-weight: bolder;">{{sale.id}}</td>
+                <td style="text-align: center;font-weight: bolder;">{{sale.product_id}}</td>
+                <td style="text-align: center;font-weight: bolder;">{{sale.quantity}}</td>
+                <td style="text-align: center;font-weight: bolder;">{{sale.created_at}}</td>
             </tr>
 
             {% endfor %}
