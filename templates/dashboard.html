@@ -1,97 +1,77 @@
 {% extends "base.html" %}
 {% block title%}Dashboard{% endblock%}
 {% block content%}
-<div style="background-color: lightgrey;">
-    <div class="wrapper d-flex align-items-stretch" style="margin-top: 6%;">
-        <nav id="sidebar" style="background-color: #051922;">
-            <div class="custom-menu" style="background-color: #051922;border-radius: 50px;">
-                <button type="button" id="sidebarCollapse" class="btn btn-primary">
-                    <i class="fa fa-bars"></i>
-                    <span class="sr-only">Toggle Menu</span>
-                </button>
-            </div>
-            <div class="p-4" style="background-color:#051922;">
-                <h1><a href="/" class="logo" style="font-size: larger;">MyShop <span style="color: white;">My Dashboard</span></a></h1>
-                <ul class="list-unstyled components mb-5">
-                    <li class="active">
-                        <a href="/"><span class="fa fa-home mr-3"  style="color: #ef8024;"> </span> <span  style="color: #ef8024;">Home</span></a>
-                    </li>
-                    <li>
-                        <a href="#"><span class="fa fa-user mr-3"  style="color: #ef8024;"></span> </span> <span  style="color: #ef8024;">Profile</span></a>
-                    </li>
-                    <li>
-                        <a href="/products"><span class="fa fa-briefcase mr-3"  style="color: #ef8024;"></span ><span style="color: #ef8024;" >Products</span> </a>
-                    </li>
-                    <li>
-                        <a href="/sales"><span class="fa fa-suitcase mr-3" style="color: #ef8024;"></span> <span style="color: #ef8024;">Sales</span></a>
-                    </li>
-                    <li>
-                        <a href="/contact"><span class="fa fa-cogs mr-3"  style="color: #ef8024;"></span> <span style="color: #ef8024;">Support</span></a>
-                    </li>
-                    <li>
-                        <a href="/logout"><span class="fa fa-paper-plane mr-3"  style="color: #ef8024;"></span> <span style="color: #ef8024;">Logout</span></a>
-                    </li>
-                </ul>
 
-                <div class="mb-5">
-                    <h3 class="h6 mb-3">Subscribe for newsletter</h3>
-                    <form action="/subscribe" class="subscribe-form" method="post">
-                        <div class="form-group d-flex">
-                            <div class="icon"><span class="icon-paper-plane"></span></div>
-                            <input type="text" class="form-control" placeholder="Enter Email Address" name="email">
-                        </div>
-                    </form>
-                </div>
-
-                <div class="footer">
-                    <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>document.write(new Date().getFullYear());</script>. MyShop. All Rights Reserved
-                        <i class="icon-heart" aria-hidden="true"></i>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </p>
-                </div>
-
-            </div>
-        </nav>
-
-        <!-- Page Content  -->
-        <div id="content" class="p-4 p-md-5 pt-5">
+<body
+    style="background-image: url(/static/assets/img/dash-bg-01.jpg);background-repeat: no-repeat;background-size:cover;background-color:lightgrey;">
 
 
-            <div class="row" style="margin-left: 30%;">
-                <div class="col-sm-3 ">
-                    <div class="card" style="width: 170px;background-color: blanchedalmond;text-align: center;">
-                        <h4 style="color: #ef8024;">Sales Today <br><br>
+    <div style="height: 400px;margin-top: 2%;">
+        <div class="container-fluid pt-4 px-4">
+            <div class="row g-4" style="height: 20%;margin-left: 10%;">
 
-                        <span style="color:#384B56;">  </span>
-                        </h4>
-                        
-                    </div>
-                </div>
-                <div class="col-sm-3 " style="margin-left: 8%;text-align: center;">
-                    <div class="card" style="width: 170px;background-color: blanchedalmond;">
-                        <h4 style="color: #ef8024;">Profit Today <br><br>
-
-                        <span style="color:#384B56;">  </span>
-                        </h4>
-                        
-                    </div>
-                </div>
-                
-
-            </div>
-            <div class="container-fluid pt-4 px-4">
-                <div class="row g-4">
-                    <div class="col-sm-6 col-xl-6">
-                        <div class="bg-lightt rounded h-100 p-4">
-                            <canvas id="bar-chart" width="800" height="600"></canvas>
+                <div class="col-sm-2 col-xl-3" style="margin-left: 10%;">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-between p-2"
+                        style="background-image: url(/static/assets/images\ \(2\).jpeg);background-size: cover;">
+                        <i class="fa fa-chart-bar fa-3x text-primary" style="font-size: medium;"></i>
+                        <div class="ms-3">
+                            <p class="mb-2" style="color: #F28123;font-size: 90%;font-weight: bolder;">Sales Today</p>
+                            <h6 class="mb-0">KSH. {{sal_td}}</h6>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-xl-6 ">
-                        <div class="bg-lightt rounded h-100 p-4">
-                            <canvas id="line-chart" width="800" height="600"></canvas>
+                </div>
+                <div class="col-sm-2 col-xl-3">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-between p-2"
+                        style="background-image: url(/static/assets/images\ \(1\).jpeg);background-size: cover;background-image: red;">
+                        <i class="fa fa-chart-bar fa-3x text-primary" style="font-size: medium;"></i>
+                        <div class="ms-3">
+                            <p class="mb-2" style="font-size: 90%;color: #F28123;font-weight: bolder;">Profit Today</p>
+                            <h6 class="mb-0">KSH. {{p}}</h6>
                         </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-xl-3">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-between p-2"
+                        style="background-image: url(/static/assets/images\ \(4\).jpeg);background-size: cover;background-image: red;">
+                        <i class="fa fa-chart-bar fa-3x text-primary" style="font-size: medium;"></i>
+                        <div class="ms-3">
+                            <p class="mb-2" style="font-size: 90%;color: #F28123;font-weight: bolder;">Monthly Sales</p>
+                            <h6 class="mb-0">KSH.{{sm_summ}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-xl-3">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-between p-2"
+                        style="background-image: url(/static/assets/img4.avif);background-size: cover;background-image: red;">
+                        <i class="fa fa-chart-bar fa-3x text-primary" style="font-size: medium;"></i>
+                        <div class="ms-3">
+                            <p class="mb-2" style="font-size: 90%;color: #F28123;font-weight: bolder;"> Monthly Profit
+                            </p>
+                            <h6 class="mb-0">KSH.{{pr_mn}}</h6>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+
+
+        <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+                <div class="col-sm-6 col-xl-6">
+                    <div class="bg-light rounded h-100 p-4">
+                        <h6 class="mb-4">Day Analytics</h6>
+                        <canvas id="line-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-6">
+                    <div class="bg-light rounded h-100 p-4">
+                        <h6 class="mb-4">Product Analytics</h6>
+                        <canvas id="barchart"></canvas>
                     </div>
                 </div>
             </div>
@@ -99,70 +79,99 @@
 
 
         </div>
+        <!-- Sale & Revenue End -->
 
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
+    <script>
+        // Data
+        var products = ['Product A', 'Product B', 'Product C', 'Product D'];
+        var sales = [5000, 7000, 4000, 6000];
+        var profits = [2000, 3000, 1500, 2500];
 
-    <div>
-        <div>
-
-        </div>
-
-    </div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-<!-- <script>
-    new Chart(document.getElementById("bar-chart"), {
-        type: 'bar',
-        data: {
-            labels: {{ name | safe}},
-        datasets: [
-        {
-            label: "Profit(Ksh)",
-            backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
-            data: {{ prof_prod | safe}}
+        // Chart.js
+        var ctx = document.getElementById('barchart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{name | safe}},
+                datasets: [{
+                    label: 'Profit',
+                    data: {{profit_product | safe}},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Sales',
+                    data: {{sale_product | safe}},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Sales and Profit per Product'
                 }
-        , {
-            label: "Sales(Ksh.)",
-            backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
-            data: {{ sales_prod | safe}}
-                }
-
-    ]
-        },
-        options: {
-        legend: { display: false },
-        title: {
-            display: true,
-            text: 'Predicted world population (millions) in 2050'
-        }
-    }
-    });
-
-    new Chart(document.getElementById("line-chart"), {
-        type: 'line',
-        data: {
-            labels: {{ day_prof | safe}},
-        datasets: [{
-            data: {{ prof_day | safe}},
-        label: "Profit",
-        borderColor: "#3e95cd",
-        fill: false
-            }, {
-            data: {{ sal_d | safe}},
-        label: "Sales",
-        borderColor: "#8e5ea2",
-        fill: false
             }
-    ]
-        },
-        options: {
-        title: {
-            display: true,
-            text: 'World population per region (in millions)'
-        }
-    }
-    });
-</script> -->
+        });
+
+
+
+         // Data
+         var products = ['Product A', 'Product B', 'Product C', 'Product D'];
+        var sales = [5000, 7000, 4000, 6000];
+        var profits = [2000, 3000, 1500, 2500];
+
+        // Chart.js
+        var ctx = document.getElementById('line-chart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{day | safe}},
+                datasets: [{
+                    label: 'Sales',
+                    data: {{sale_day | safe}},
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Profit',
+                    data: {{profit_day | safe}},
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Sales and Profit per Product'
+                }
+            }
+        });
+
+
+    </script>
+    </div>
+</body>
 
 {% endblock%}

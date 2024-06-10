@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title%}Dashboard{% endblock%}
 {% block content%}
-<body style="background-color:lightgray;">
+<body style="background-color:lightgray;background-image: url(/static/assets/img/dash-bg-01.jpg);background-repeat: no-repeat;background-size: cover;">
     
 <div class="sale_modal" style="margin-top: 3%;">
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background-color:burlywood;color: #ef8024;font-weight: bolder;border-color: white;margin-left: 10%;">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background-color:white;color: #ef8024;font-weight: bolder;border-color: white;margin-left: 10%;">
         Make Sale
     </button>
 
@@ -13,15 +13,15 @@
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel" >Make a Sale</h1>
+                <div class="modal-header" style="background-color: #384B56;">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel" style="font-weight: bolder;">Make a Sale</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="background-image:url(/static/assets/Costa-Rica-wood.webp);background-repeat: no-repeat;background-size: cover;">
                 
                     <form action="/make_sale" method="post">
                         <select class="form-select" aria-label="Default select example"
-                            style="width: 50%;margin-left:25%;color: #051922;font-weight: bolder;border-color: #ef8024;" name="select_prod">
+                            style="width: 50%;margin-left:25%;color: #051922;font-weight: bolder;border-color: #ef8024;" name="select_prod" required>
                             <option>Select Product</option>
                             {% for product in products %}
                             <option value="{{product.id}}">{{product.name}}</option>
@@ -29,15 +29,15 @@
                         </select>
                         <input type="number" id="inputPassword6" class="form-control"
                             aria-describedby="passwordHelpInline" placeholder="Quantity"
-                            style="width: 30%;margin-left: 35%;margin-top: 3%;border-color:#ef8024 ;" name="quantity">
+                            style="width: 30%;margin-left: 35%;margin-top: 3%;border-color:#ef8024 ;" name="quantity" required>
 
                         <button type="submit" class="btn btn-primary"
-                            style="margin-left: 70%;margin-top:3%;background-color: white;color: #ef8024;font-weight: bolder;background-color: #051922;border-color: #ef8024;">Make
+                            style="margin-left: 70%;margin-top:3%;background-color:white;color: #ef8024;font-weight: bolder;background-color: white;border-color: #ef8024;">Make
                             Sale</button>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer" style="background-color: #384B56;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="color:#051922;background-color: white;font-weight: bolder;">Close</button>
                 </div>
             </div>
         </div>
