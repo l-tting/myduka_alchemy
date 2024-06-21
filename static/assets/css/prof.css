@@ -1,0 +1,29 @@
+
+
+.profilee {
+    /* display: flex; */
+    align-items: center;
+    cursor: pointer;
+}
+
+
+.dropdownn {
+    display: none;
+
+    top: 20px;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    width: 400px;
+}
+
+.dropdownn p {
+    padding: 12px 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.dropdownn p:hover {
+    background-color: #f1f1f1;
+}
