@@ -1,0 +1,16 @@
+.dot {
+    height: 5px;
+    width: 5px;
+    background-color: #000;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+    background-color:#F28123;  }
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }

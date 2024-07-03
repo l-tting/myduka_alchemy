@@ -52,7 +52,7 @@
 	<!-- responsive -->
 	<link rel="stylesheet" href="/static/assets/css/responsive.css">
 
-
+	<link rel="stylesheet" href="/static/assets/css/dot.css">
 
 </head>
 
@@ -90,31 +90,69 @@
 								<li><a href="/sales">Sales</a></li>
 								<li><a href="/dashboard">Dashboard</a></li>
 								<li><a href="/contact">Contact Us</a></li>
-								<li><a ><i class="fa-solid fa-user" onclick="toggleMenu()"></i></a></li>
+								<li style="margin-left: 6%;"><a href="#"><i class="fa-solid fa-circle-user fa-lg"
+											onclick="toggleMenu()"></i></a></li>
 								<div class="sub-menu-wrap" id="subMenu">
 									<div class="sub-menu">
-										<div class="user-info">
-										<img src="tst1.jpeg" alt="" style="width: 20px; height: 20px; border-radius: 50%;">
-										<h5>James Aldrino</h5>
+										<div class="user-info" style="display: flex;justify-content: space-between;">
+											<div class="prof-pc">
+												<img src="/static/assets/user-pc.jpg" alt="">
+											</div>
+											<h5 style="margin-left: 7%;float: right;" class="sess-name"><span style="color:;">User:</span> 
+												{{session.name}}</h5>
 										</div>
 										<hr>
-										<a href="" class="sub-menu-link">
-											<img src="" >
-											<p>Edit Profile</p>
-											<span>></span>
+										<a href="/reset" class="sub-menu-link">
+											<i class="fa-solid fa-unlock" style="color: #ef8024;margin-left: 4%;"></i>
+											<p style="margin-top: 0%; font-weight: bolder;color: lightgrey;" >Change
+												Password
+												<span style="color: #ef8024;font-weight: bolder;margin-left: 15%;">></span>
+
+											</p>
 										</a>
-										<a href="" class="sub-menu-link">
-											<img src="" >
-											<p>Edit Profile</p>
-											<span>></span>
+										<a href="/logout" class="sub-menu-link">
+											<i class="fa-solid fa-right-from-bracket" style="color: #ef8024;margin-left: 4%;"></i>
+											<p style="margin-top: 0%;font-weight: bolder;color: lightgrey;">Log Out
+												<span
+													style="color:#ef8024;font-weight: bolder;margin-left: 20%;">></span>
+											</p>
 										</a>
-										<a href="" class="sub-menu-link">
-											<img src="" >
-											<p>Edit Profile</p>
-											<span>></span>
+										<a href="/logout" class="sub-menu-link">
+											<i class="fa-solid fa-users" style="color: #ef8024;margin-left: 4%;"></i>
+											<p style="margin-top: 0%;font-weight: bolder;color: lightgrey;">Use a
+												different account
+												<span
+													style="color:#ef8024;font-weight: bolder;margin-left: 5%;">></span>
+											</p>
 										</a>
+										<a href="/logout" class="sub-menu-linkk">
+
+											<p style="margin-top: 7%;font-weight: bolder;">
+												<h5
+													style="position: absolute; color: #ef8024;margin-left: 27%;font-size: small;">
+													<i class="fa-solid fa-copyright fa-xs"></i>MyShop 2024
+												</h5>
+											</p>
+
+										</a>
+
+										<!-- <h5 style="position: absolute;margin-left: 30%;margin-top: 2.1%;font-size:smaller; color: #ef8024;">
+											MyShop 2024</h5> -->
+
+										<!-- <a href="" class="sub-menu-link" style="margin-bottom: 3%;">
+											<i class="fa-solid fa-users" style="margin-bottom: 5%;"></i>
+											<p style="margin-top: 5%;font-weight: bolder;">Sign in with different account</p>
+											<span style="margin-bottom: 5%;">></span>
+										</a> -->
+
 									</div>
 								</div>
+								<li style="margin-left: 0%;">
+								<li class="dot"></li>
+								<a href="#" style="color:lightgrey;font-weight: bolder;  animation: blink 3s infinite;">
+									{{session.name.lower()}}</a>
+								</li>
+								<li class="dot"><a href="#"></a></li>
 								{% else %}
 								<li><a href="/login">Login</a></li>
 								<li><a href="/register">Sign Up</a></li>
@@ -404,10 +442,10 @@
 		let table = new DataTable('#dt_t');
 	</script>
 	<script>
-		 let subMenu = document.getElementById("subMenu");
-        function toggleMenu(){
-            subMenu.classList.toggle("open-menu");
-        }
+		let subMenu = document.getElementById("subMenu");
+		function toggleMenu() {
+			subMenu.classList.toggle("open-menu");
+		}
 	</script>
 </body>
 
