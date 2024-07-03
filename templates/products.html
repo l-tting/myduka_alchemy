@@ -16,7 +16,7 @@
         </div>
         <div class="modal-body" style="background-image: url(/static/assets/Costa-Rica-wood.webp);background-size: cover;background-repeat: no-repeat;">
           <form action="/add_prods" method="post">
-
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
             <input type="text" name="name" style="width: 200px;margin-left: 10%; height: 35px;border-color: #ef8024;"
               placeholder="Product Name" required><br>
             <input type="number" name="buying" placeholder="Buying Price(Ksh.)"
@@ -61,7 +61,7 @@
               {% endfor %}
 
             </select>
-
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
             <input type="number" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline"
               style="width: 40%;margin-left: 30%;margin-top:4%;border-color: #ef8024;" placeholder="Buying Price"
               name="buying">

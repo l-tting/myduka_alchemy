@@ -27,6 +27,7 @@
                             <option value="{{product.id}}">{{product.name}}</option>
                             {% endfor %}
                         </select>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="number" id="inputPassword6" class="form-control"
                             aria-describedby="passwordHelpInline" placeholder="Quantity"
                             style="width: 30%;margin-left: 35%;margin-top: 3%;border-color:#ef8024 ;" name="quantity" required>

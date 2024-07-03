@@ -5,18 +5,21 @@ from sqlalchemy import func,desc
 from flask_mail import Mail,Message
 from flask_login import LoginManager,login_required,login_user,logout_user,current_user
 from werkzeug.security import generate_password_hash,check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer
 
 # from werkzeug.utils import secure_filename
-import os
+# import os
 # app = Flask(__name__)
 #secret key - flash & sessions & Mail
 app.config['SECRET_KEY'] = 'DJFKKFI8498'
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-serial = Serializer(app.config['SECRET_KEY'],expires_in=60)
-token =serial.dumps({'user_id': current_user.id})
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
+# serial = Serializer(app.config['SECRET_KEY'],expires_in=60)
+# token =serial.dumps({'user_id': current_user.id})
 
 
 #mail configurations
@@ -51,7 +54,7 @@ def products():
 @app.route('/sales')
 @login_required
 def sales():
-    products = Product.query.all()
+    products = Product.query.filter_by(user_id=current_user.id)
     sales = Sale.query.filter_by(user_id=current_user.id).all()
     return render_template('sales.html',products= products,sales=sales)
 
@@ -253,10 +256,11 @@ def send_mail():
 @app.route('/reset',methods=['GET','POST'])
 def reset():
     form = ResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            send_mail()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                send_mail()
         flash("Reset Request Sent. Check your mail",'success')
         return redirect(url_for('login'))
     return render_template('password.html',form =form,legend='Reset Password')
@@ -264,6 +268,7 @@ def reset():
 #logging out
 @app.route('/logout')
 def log_out():
+    #logging out
     logout_user()
     return redirect(url_for('login'))
 
