@@ -268,6 +268,7 @@ def reset():
 #logging out
 @app.route('/logout')
 def log_out():
+    send_mail()
     #logging out
     logout_user()
     return redirect(url_for('login'))
