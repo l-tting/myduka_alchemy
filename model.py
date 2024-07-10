@@ -5,7 +5,7 @@ from sqlalchemy import func
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField
-from wtforms.validators import Length,InputRequired,ValidationError
+from wtforms.validators import Length,InputRequired,ValidationError,DataRequired,EqualTo
 from flask_wtf.csrf import CSRFProtect
 
 
@@ -79,6 +79,13 @@ class LoginForm(FlaskForm):
 class ResetForm(FlaskForm):
     email = StringField(validators=[InputRequired(),Length(min=4,max=30)],render_kw={'placeholder':'Email'})
     submit = SubmitField("Confirm")
+
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)],render_kw={'placeholder':'Password'})
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('password')],render_kw={'placeholder':'Confirm Password'})
+    submit = SubmitField('Change Password')
+
+
 #accessing current application context
 with app.app_context():
     db.create_all()

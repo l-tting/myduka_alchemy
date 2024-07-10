@@ -22,12 +22,18 @@
             <div class="col-lg-8 mb-5 mb-lg-0">
                 <div class="form-title">
                     <h2>Have you any question?</h2>
-                    <p><span style="font-weight: bolder;">Hi there, {{session.name.title()}}.</span> Reach out to our support team to learn more about our products and find help resolving any issue.</p>
+                    <p><span style="font-weight: bolder;">Hi there, {{session.name.title()}}.</span> Reach out to our
+                        support team to learn more about our products and find help resolving any issue.</p>
                 </div>
-                 <div id="form_status"></div>
+                <div id="form_status"></div>
                 <div class="contact-form">
                     <form action="/send" onSubmit="return valid_datas( this );" method="post">
                         <p>
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+                        </p>
+                        <p>
+
                             <input type="text" placeholder="Name" name="name" id="name" required>
                             <input type="email" placeholder="Email" name="email" id="email" required>
                         </p>
@@ -35,7 +41,8 @@
                             <input type="tel" placeholder="Phone" name="phone" id="phone" required>
                             <input type="text" placeholder="Subject" name="subject" id="subject" required>
                         </p>
-                        <p><textarea name="message" id="message" cols="30" rows="10" placeholder="Message" required></textarea></p>
+                        <p><textarea name="message" id="message" cols="30" rows="10" placeholder="Message"
+                                required></textarea></p>
                         <input type="hidden" name="token" value="FsWga4&@f6aw" />
                         <p><input type="submit" value="Submit"></p>
                     </form>
@@ -77,7 +84,10 @@
 
 <!-- google map section -->
 <div class="embed-responsive embed-responsive-21by9">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.045993145033!2d36.822060592651354!3d-1.3187776895767658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f19493c84e745%3A0xbd582ef00be7ea1e!2sCorner%20house!5e0!3m2!1sen!2ske!4v1715676078886!5m2!1sen!2ske" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.045993145033!2d36.822060592651354!3d-1.3187776895767658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f19493c84e745%3A0xbd582ef00be7ea1e!2sCorner%20house!5e0!3m2!1sen!2ske!4v1715676078886!5m2!1sen!2ske"
+        width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
 <!-- end google map section -->
 

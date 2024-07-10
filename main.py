@@ -1,11 +1,11 @@
 from flask import Flask,render_template,request,redirect,url_for,flash,session
 # from flask_uploads import UploadSet,IMAGES,configure_uploads
-from model import db,Product,User,app,Sale,RegisterForm,LoginForm,ResetForm
+from model import db,Product,User,app,Sale,RegisterForm,LoginForm,ResetForm,ChangePasswordForm
 from sqlalchemy import func,desc
 from flask_mail import Mail,Message
 from flask_login import LoginManager,login_required,login_user,logout_user,current_user
 from werkzeug.security import generate_password_hash,check_password_hash
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer 
 
 # from werkzeug.utils import secure_filename
 # import os
@@ -16,6 +16,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
+
 
 
 # serial = Serializer(app.config['SECRET_KEY'],expires_in=60)
@@ -33,6 +36,10 @@ app.config['MAIL_PASSWORD'] = 'tmlr uehu ftjs pyky'
 
 #mail instance
 mail = Mail(app)
+
+def generate_password_reset_token(email):
+    return serializer.dumps(email, salt='password-reset-salt')
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -248,27 +255,66 @@ def send():
             flash(f'Failed to send email. Error: {str(e)}')
     return redirect(url_for('contact'))
 
-def send_mail():
-    pass
+def generate_password_reset_token(user_id):
+   return serializer.dumps({"user_id": user_id}, salt='password-reset-salt')
 
+
+def send_mail(to_email, reset_url):
+    msg = Message('Password Reset Request', sender=app.config['MAIL_USERNAME'], recipients=[to_email])
+    msg.body = f'Click the link to reset your password: {reset_url}'
+    mail.send(msg)
 
 #reset
-@app.route('/reset',methods=['GET','POST'])
-def reset():
+@app.route('/reset_request',methods=['GET','POST'])
+def reset_password_request():
     form = ResetForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
+            email = form.email.data
+            user = User.query.filter_by(email=email).first()
             if user:
-                send_mail()
-        flash("Reset Request Sent. Check your mail",'success')
-        return redirect(url_for('login'))
-    return render_template('password.html',form =form,legend='Reset Password')
+                token = generate_password_reset_token(user.id)
+                reset_url = url_for('reset_password', token=token, _external=True)
+                send_mail(email, reset_url)
+                flash("Reset Request Sent. Check your mail",'success')
+            else:
+                flash("Email address not found check email or register",'error')
+                return redirect(url_for('register'))
+    return render_template('reset_request.html',form =form,legend='Reset Password')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    
+    data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    user_id = data['user_id']
+    user = User.query.filter_by(id=user_id).first()
+    print(user)
+
+
+    form = ChangePasswordForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            user = User.query.filter_by(user_id=user_id).first()
+            print(user)
+            if user:
+                hashed_password = generate_password_hash(form.password.data)
+                user.password = hashed_password
+                db.session.commit()
+                flash('Your password has been updated!', 'success')
+                return redirect(url_for('login'))
+            else:
+                print('User not found.', 'error')
+                return redirect(url_for('reset_password_request'))
+
+    return render_template('password.html', form=form)
+
+
+
 
 #logging out
 @app.route('/logout')
 def log_out():
-    send_mail()
+    
     #logging out
     logout_user()
     return redirect(url_for('login'))
