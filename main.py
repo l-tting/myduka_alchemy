@@ -71,14 +71,17 @@ def register():
     form = RegisterForm()  # Define the form outside the if block
     if request.method == 'POST':
         if form.validate_on_submit():
-            hashed_password = generate_password_hash(form.password.data)
-            new_user = User(full_name=form.full_name.data, email=form.email.data, password=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect(url_for('login'))
-        else:
-            flash("Email already exists", 'error')
-    return render_template('register.html', form=form)  # Move the form variable here
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                flash("User already exists.Please Login",'error')
+            else:
+                hashed_password = generate_password_hash(form.password.data)
+                new_user = User(full_name=form.full_name.data, email=form.email.data, password=hashed_password)
+                db.session.add(new_user)
+                db.session.commit()
+                return redirect(url_for('dashboard'))
+       
+    return render_template('register.html', form=form)  
 
 
 #login existing user
@@ -114,7 +117,7 @@ def contact():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-
+    product = Product.query.filter_by(user_id=current_user.id).all()
     #finding profit per product
     profit_per_product = db.session.query(
         Product.name,
@@ -196,7 +199,7 @@ def dashboard():
         p_m.append(i[1])
     pr_mn = sum(p_m)
 
-    return render_template('dashboard.html', profit_product=profit_product,sm_summ=sm_summ,sal_td=sal_td,p=p,name=name,sale_product=sale_product,day=day,sale_day=sale_day,profit_day=profit_day,pr_mn=pr_mn) 
+    return render_template('dashboard.html', profit_product=profit_product,sm_summ=sm_summ,sal_td=sal_td,p=p,name=name,sale_product=sale_product,day=day,sale_day=sale_day,profit_day=profit_day,pr_mn=pr_mn,product=product) 
 # sale_per_product=sale_per_product, sales_per_day=sales_per_day, profit_today=profit_today,p=p,name=name,day= day ,profit_per_day=profit_per_day,sale_day=sale_day,profit_day=profit_day,sale_product= sale_product,sal_td=sal_td,i=i,s_m=s_m,sm_summ=sm_summ,pr_mn=pr_mn)
         
 
@@ -209,9 +212,44 @@ def add_prods():
         buying = request.form['buying']
         selling = request.form['selling']
         stock_quantity = request.form['stock']
-        new = Product(user_id=current_user.id,name=name,buying_price=buying,selling_price=selling,stock_quantity=stock_quantity)
-        db.session.add(new)
-        db.session.commit()
+        existing_product = Product.query.filter_by(user_id= current_user.id,name=name).first()
+        if existing_product:
+            flash("Product already exists")
+            return redirect(url_for('products'))
+        else:
+            new = Product(user_id=current_user.id,name=name,buying_price=buying,selling_price=selling,stock_quantity=stock_quantity)
+            db.session.add(new)
+            db.session.commit()
+    return redirect(url_for('products'))
+
+@app.route('/update_prods',methods=['GET','POST'])
+def update_prods():
+    name = request.form['select']
+    buying = request.form['buying']
+    selling = request.form['selling']
+    quantity = request.form['stock']
+    products = Product.query.filter_by(user_id= current_user.id)
+    updated = Product(user_id = current_user.id,name=name,buying_price=buying,selling_price=selling,stock_quantity=quantity)
+    db.session.add(updated)
+    db.session.commit()
+    products.stock_quantity += quantity
+    db.session.commit()
+    return redirect(url_for('products'))
+
+@app.route('/delete_product',methods= ['GET','POST'])
+def delete_product():
+    if request.method == 'POST':
+        name = request.form['product']
+        print(name)
+        if name:
+            product = Product.query.filter_by(user_id=current_user.id, name=name).first()
+            if product: 
+                db.session.delete(product)
+                db.session.commit()
+            else:
+                flash("Product not found",'error')
+        else:
+            flash("Product name not provided","error")
     return redirect(url_for('products'))
 
 #making a sale
@@ -284,19 +322,16 @@ def reset_password_request():
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    
     data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
     user_id = data['user_id']
     user = User.query.filter_by(id=user_id).first()
-    print(user)
-
+    u_l = []
+    u_l.append(user)
 
     form = ChangePasswordForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = User.query.filter_by(user_id=user_id).first()
-            print(user)
-            if user:
+            if len(u_l) >=1:
                 hashed_password = generate_password_hash(form.password.data)
                 user.password = hashed_password
                 db.session.commit()
@@ -305,11 +340,35 @@ def reset_password(token):
             else:
                 print('User not found.', 'error')
                 return redirect(url_for('reset_password_request'))
-
     return render_template('password.html', form=form)
 
+# @app.route('/reset_password/<token>', methods=['GET', 'POST'])
+# def reset_password(token):
+#     try:
+#         data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+#         user_id = data['user_id']
+#         user = User.query.get(user_id)  # This line retrieves the user from the database using the ID from the token.
+#         form = ChangePasswordForm()
+#         if request.method == 'POST' and form.validate_on_submit():
+#             if user:
+#                 hashed_password = generate_password_hash(form.password.data)
+#                 user.password = hashed_password
+#                 db.session.commit()
+#                 flash('Your password has been updated!', 'success')
+#                 return redirect(url_for('login'))
+#     except Exception as e:
+#         flash(f'Invalid or expired token: {str(e)}', 'error')
+#         return redirect(url_for('reset_password_request'))
+#     return render_template('password.html', form=form)
 
+#upload image
+@app.route('/uploadimg')
+def upload_image():
+    return render_template()
 
+@app.route('/prof')
+def profile():
+    return render_template('profile.html')
 
 #logging out
 @app.route('/logout')

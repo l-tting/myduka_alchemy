@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import func
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField
+from wtforms import StringField,PasswordField,SubmitField,IntegerField
 from wtforms.validators import Length,InputRequired,ValidationError,DataRequired,EqualTo
 from flask_wtf.csrf import CSRFProtect
 
@@ -26,13 +26,12 @@ class Product(db.Model):
     __tablename__= 'products'
     id = db.Column(db.Integer,primary_key=True,nullable = False)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
-    name = db.Column(db.String,nullable=False,unique=True)
+    name = db.Column(db.String,nullable=False)
     buying_price = db.Column(db.Integer,nullable=False)
     selling_price = db.Column(db.Integer,nullable=False)
     stock_quantity = db.Column(db.Integer,nullable=False)
     #foreign key r/ship
     sales = db.relationship('Sale',backref='product')
-    
     def __repr__(self):
         return f'<PRODUCTS %r> = {self.id} ,name = {self.name}, buying_price = {self.buying_price},selling_price = {self.selling_price},stock_quantity = {self.stock_quantity}'
 
@@ -45,12 +44,10 @@ class Sale(db.Model):
     created_at =db.Column(db.DateTime,nullable=False,default = datetime.utcnow())
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
 
-
-
 #user model
 class User(db.Model,UserMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer,primary_key=True,nullable=False)
+    id = db.Column(db.Integer,primary_key=True,nullable=False,unique=True)
     full_name =db.Column(db.String,nullable=False)
     email = db.Column(db.String,nullable=False,unique=True)
     password=db.Column(db.String,nullable=False)
@@ -68,8 +65,8 @@ class RegisterForm(FlaskForm):
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(200), nullable=False)
-
-
+    def __init__(self, url):
+        self.url = url
 
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(),Length(min=4,max=30)],render_kw={'placeholder':'Email'})
@@ -85,6 +82,13 @@ class ChangePasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('password')],render_kw={'placeholder':'Confirm Password'})
     submit = SubmitField('Change Password')
 
+class UpdateProdForm(FlaskForm):
+    buying_price = IntegerField(validators=[InputRequired(),Length(min=1)],render_kw={'placeholder':'Buying Price'})
+    selling_price = IntegerField(validators=[InputRequired(),Length(min=1)],render_kw={'placeholder':'Buying Price'})
+    quantity = IntegerField(validators=[InputRequired(),Length(min=1)],render_kw={'placeholder':'Buying Price'})
+
+class RemoveProdForm(FlaskForm):
+    pass
 
 #accessing current application context
 with app.app_context():

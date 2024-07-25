@@ -13,7 +13,9 @@
 							<p class="subtitle">Cutting Edge POS</p>
 							<h1>Stay ahead of the curve with new technology</h1>
 							<div class="hero-btns">
+								{% if current_user.is_not_authenticated%}
 								<a href="/register" class="boxed-btn">Get Started</a>
+								{% endif %}
 								<a href="/contact" class="bordered-btn">Contact Us</a>
 							</div>
 						</div>
@@ -32,7 +34,10 @@
 							<p class="subtitle">Instant Sales!</p>
 							<h1>Improve Customer Experience</h1>
 							<div class="hero-btns">
+								{% if current_user.is_not_authenticated%}
+
 								<a href="/register" class="boxed-btn">Get Started</a>
+								{% endif %}
 								<a href="/contact" class="bordered-btn">Contact Us</a>
 							</div>
 						</div>
@@ -51,7 +56,9 @@
 							<p class="subtitle">Going Up!</p>
 							<h1>Scale & Secure your Business</h1>
 							<div class="hero-btns">
+								{% if current_user.is_not_authenticated%}
 								<a href="/register" class="boxed-btn">Sign Up</a>
+								{% endif %}
 								<a href="/contact" class="bordered-btn">Contact Us</a>
 							</div>
 							
@@ -127,7 +134,10 @@
 					<h2>We are <span class="orange-text">MyShop</span></h2>
 					<p>Simplify your business today using MyShop POS system and get instant value with smooth operations,simplified invoicing,supllier order management,security and extensive analytics.</p>
 					<p>Get your customers back for their next purchase with quality service and quicker payments!</p>
+					{% if current_user.is_not_authenticated%}
+
 					<a href="/login" class="boxed-btn mt-4">Discover More</a>
+					{% endif %}
 				</div>
 			</div>
 		</div>
