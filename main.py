@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,url_for,flash,session
+from flask import Flask,render_template,request,redirect,url_for,flash,session,render_template_string
 # from flask_uploads import UploadSet,IMAGES,configure_uploads
 from model import db,Product,User,app,Sale,RegisterForm,LoginForm,ResetForm,ChangePasswordForm
 from sqlalchemy import func,desc
@@ -45,6 +45,13 @@ def generate_password_reset_token(email):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# @app.context_processor
+# def current_user():
+#     name = User.query.filter_by(user_id=current_user.id).first()
+#     return name
+
+
+
 #home
 @app.route('/')
 def home():
@@ -84,7 +91,7 @@ def register():
     return render_template('register.html', form=form)  
 
 
-#login existing user
+
 @app.route('/login',methods = ['GET','POST'])
 def login():
     form = LoginForm()
@@ -231,6 +238,7 @@ def update_prods():
     products = Product.query.filter_by(user_id= current_user.id)
     updated = Product(user_id = current_user.id,name=name,buying_price=buying,selling_price=selling,stock_quantity=quantity)
     db.session.add(updated)
+    
     db.session.commit()
     products.stock_quantity += quantity
     db.session.commit()
@@ -274,10 +282,10 @@ def make_sale():
             flash('Product not found','error')
     return redirect(url_for('sales'))
 
-#sending mail
-@app.route('/send',methods= ['GET','POST'])
+
+@app.route('/send_support_mail',methods= ['GET','POST'])
 @login_required
-def send():
+def send_support_mail():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
@@ -293,75 +301,47 @@ def send():
             flash(f'Failed to send email. Error: {str(e)}')
     return redirect(url_for('contact'))
 
-def generate_password_reset_token(user_id):
-   return serializer.dumps({"user_id": user_id}, salt='password-reset-salt')
-
-
-def send_mail(to_email, reset_url):
-    msg = Message('Password Reset Request', sender=app.config['MAIL_USERNAME'], recipients=[to_email])
-    msg.body = f'Click the link to reset your password: {reset_url}'
-    mail.send(msg)
-
-#reset
-@app.route('/reset_request',methods=['GET','POST'])
-def reset_password_request():
+@app.route('/reset_request',methods= ['GET','POST'])
+def reset_request():
     form = ResetForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            email = form.email.data
-            user = User.query.filter_by(email=email).first()
+            user = User.query.filter_by(email=form.email.data).first()
             if user:
-                token = generate_password_reset_token(user.id)
-                reset_url = url_for('reset_password', token=token, _external=True)
-                send_mail(email, reset_url)
-                flash("Reset Request Sent. Check your mail",'success')
-            else:
-                flash("Email address not found check email or register",'error')
-                return redirect(url_for('register'))
-    return render_template('reset_request.html',form =form,legend='Reset Password')
+                send_reset_password_email(user)
+                flash("Email sent")
+    return render_template('reset_request.html',form=form)
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
-    user_id = data['user_id']
-    user = User.query.filter_by(id=user_id).first()
-    u_l = []
-    u_l.append(user)
 
-    form = ChangePasswordForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            if len(u_l) >=1:
-                hashed_password = generate_password_hash(form.password.data)
-                user.password = hashed_password
-                db.session.commit()
-                flash('Your password has been updated!', 'success')
-                return redirect(url_for('login'))
-            else:
-                print('User not found.', 'error')
-                return redirect(url_for('reset_password_request'))
-    return render_template('password.html', form=form)
+def send_reset_password_email(user):
+    reset_url = url_for(
+        "auth reset password",
+        token = generate_password_reset_token(),
+        user_id = user.id,
+        _external = True
+    )
+    email_body = render_template_string("The link below is to reset your password",reset_url=reset_url)
+    message = Message(
+        subject = "Reset your password",
+        body = email_body,
+        recipients=[user.email]
+    )
+    mail.send(message)
+# 
 
-# @app.route('/reset_password/<token>', methods=['GET', 'POST'])
-# def reset_password(token):
-#     try:
-#         data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
-#         user_id = data['user_id']
-#         user = User.query.get(user_id)  # This line retrieves the user from the database using the ID from the token.
-#         form = ChangePasswordForm()
-#         if request.method == 'POST' and form.validate_on_submit():
+# @app.route('/reset_password',methods=['GET','POST'])
+# def reset_password_request():
+#     form = ResetForm()
+#     if request.method == 'post':
+#         if form.validate_on_submit():
+#             user = User.query.filter_by(email = form.email.data).first()
 #             if user:
-#                 hashed_password = generate_password_hash(form.password.data)
-#                 user.password = hashed_password
-#                 db.session.commit()
-#                 flash('Your password has been updated!', 'success')
-#                 return redirect(url_for('login'))
-#     except Exception as e:
-#         flash(f'Invalid or expired token: {str(e)}', 'error')
-#         return redirect(url_for('reset_password_request'))
-#     return render_template('password.html', form=form)
+#                 send_reset_password_email(user)
+#                 flash("Email sent successfully")
+#     return  render_template('reset_request.html',form=form)
+#
 
-#upload image
+
 @app.route('/uploadimg')
 def upload_image():
     return render_template()
@@ -370,11 +350,9 @@ def upload_image():
 def profile():
     return render_template('profile.html')
 
-#logging out
+
 @app.route('/logout')
 def log_out():
-    
-    #logging out
     logout_user()
     return redirect(url_for('login'))
 
