@@ -90,6 +90,10 @@ class UpdateProdForm(FlaskForm):
 class RemoveProdForm(FlaskForm):
     pass
 
+class OTPForm(FlaskForm):
+    otp = IntegerField("otp",validators=[DataRequired()],render_kw={"placeholder":"Enter OTP Code"})
+    submit = SubmitField("Verify")
+
 #accessing current application context
 with app.app_context():
     db.create_all()

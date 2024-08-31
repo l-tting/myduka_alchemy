@@ -1,15 +1,15 @@
-from flask import Flask,render_template,request,redirect,url_for,flash,session,render_template_string
+from flask import Flask,render_template,request,redirect,url_for,flash,session,make_response
 # from flask_uploads import UploadSet,IMAGES,configure_uploads
-from model import db,Product,User,app,Sale,RegisterForm,LoginForm,ResetForm,ChangePasswordForm
+from model import db,Product,User,app,Sale,RegisterForm,LoginForm,ResetForm,ChangePasswordForm,OTPForm
 from sqlalchemy import func,desc
 from flask_mail import Mail,Message
 from flask_login import LoginManager,login_required,login_user,logout_user,current_user
 from werkzeug.security import generate_password_hash,check_password_hash
 from itsdangerous import URLSafeTimedSerializer 
-
-# from werkzeug.utils import secure_filename
-# import os
-# app = Flask(__name__)
+import random
+from flask_redis import FlaskRedis
+from datetime import timedelta
+from functools import wraps
 #secret key - flash & sessions & Mail
 app.config['SECRET_KEY'] = 'DJFKKFI8498'
 login_manager = LoginManager()
@@ -17,13 +17,9 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-
-
-
-
-# serial = Serializer(app.config['SECRET_KEY'],expires_in=60)
-# token =serial.dumps({'user_id': current_user.id})
-
+#redis
+app.config['REDIS_URL'] ='redis://localhost:6379/0'
+redis_client = FlaskRedis(app)
 
 #mail configurations
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -32,23 +28,15 @@ app.config['MAIL_USE_TLS']= False
 app.config['MAIL_USE_SSL']= True
 app.config['MAIL_USERNAME'] = 'brianletting01@gmail.com'
 app.config['MAIL_DEFAULT_SENDER'] = 'brianletting01@gmail.com'
-app.config['MAIL_PASSWORD'] = 'tmlr uehu ftjs pyky'
+app.config['MAIL_PASSWORD'] = 'ryzk znyx ihig jvwi'
 
 #mail instance
 mail = Mail(app)
-
-def generate_password_reset_token(email):
-    return serializer.dumps(email, salt='password-reset-salt')
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# @app.context_processor
-# def current_user():
-#     name = User.query.filter_by(user_id=current_user.id).first()
-#     return name
 
 
 
@@ -57,9 +45,19 @@ def load_user(user_id):
 def home():
     return render_template('index.html')
 
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
+    return no_cache
 #products
 @app.route('/products')
 @login_required
+@nocache
 def products():
     products = Product.query.filter_by(user_id=current_user.id).all()
     return render_template('products.html',products =products)
@@ -67,6 +65,8 @@ def products():
 #sales
 @app.route('/sales')
 @login_required
+@nocache
+
 def sales():
     products = Product.query.filter_by(user_id=current_user.id)
     sales = Sale.query.filter_by(user_id=current_user.id).all()
@@ -123,6 +123,8 @@ def contact():
 #user dashboard
 @app.route('/dashboard')
 @login_required
+@nocache
+
 def dashboard():
     product = Product.query.filter_by(user_id=current_user.id).all()
     #finding profit per product
@@ -301,45 +303,75 @@ def send_support_mail():
             flash(f'Failed to send email. Error: {str(e)}')
     return redirect(url_for('contact'))
 
+def generate_otp():
+    return random.randint(100000,999999)
+
+
 @app.route('/reset_request',methods= ['GET','POST'])
 def reset_request():
     form = ResetForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user:
-                send_reset_password_email(user)
-                flash("Email sent")
+            email = form.email.data
+            user = db.session.query(User).filter(User.email==email).first()
+            if not user:
+                flash("User not found","error")
+            else:
+                otp = generate_otp()
+                redis_key = f'otp:{user.id}'
+                redis_client.setex(redis_key, timedelta(minutes=10), otp)
+                redis_client.setex(f'{redis_key}_expiration', timedelta(minutes=10), 'valid')
+                message = Message(f'From {email}', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+                message.body =  f'Your password reset OTP Code is {otp}'
+            try: 
+                mail.send(message)
+                flash("OTP sent successfully","success")
+                session['reset_user_id'] = user.id
+                return redirect(url_for('verify_otp'))
+            except Exception as e:
+                flash(f"Error sending mail ,{e}","error")
     return render_template('reset_request.html',form=form)
 
-
-def send_reset_password_email(user):
-    reset_url = url_for(
-        "auth reset password",
-        token = generate_password_reset_token(),
-        user_id = user.id,
-        _external = True
-    )
-    email_body = render_template_string("The link below is to reset your password",reset_url=reset_url)
-    message = Message(
-        subject = "Reset your password",
-        body = email_body,
-        recipients=[user.email]
-    )
-    mail.send(message)
-# 
-
-# @app.route('/reset_password',methods=['GET','POST'])
-# def reset_password_request():
-#     form = ResetForm()
-#     if request.method == 'post':
-#         if form.validate_on_submit():
-#             user = User.query.filter_by(email = form.email.data).first()
-#             if user:
-#                 send_reset_password_email(user)
-#                 flash("Email sent successfully")
-#     return  render_template('reset_request.html',form=form)
-#
+@app.route('/otpverification',methods=['GET','POST'])
+def verify_otp():
+    form= OTPForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            otp = form.otp.data
+            user_id = session.get('reset_user_id')
+            redis_key = f'otp:{user_id}'
+            stored_otp = redis_client.get(redis_key)   
+            if stored_otp:
+                if str(otp) == stored_otp.decode('utf-8'):
+                    flash("OTP verified. Change Password.", "success")
+                    redis_client.delete(redis_key)
+                    redis_client.delete(f'{redis_key}_expiration')
+                    return redirect(url_for('password_reset'))
+                else:
+                    flash("Invalid otp","error")
+            else:
+                flash("Invalid OTP or OTP has expired, request new OTP","error")           
+    return render_template("otp.html",form=form)
+ 
+@app.route('/passwordreset',methods=['GET','POST'])
+def password_reset():
+    form = ChangePasswordForm()
+    if request.method == 'POST':
+         if form.validate_on_submit():
+            password = form.password.data
+            confirm_password = form.confirm_password.data
+            if password == confirm_password:
+                hashed_password = generate_password_hash(password)
+                user_id = session.get('reset_user_id')
+                user = db.session.query(User).filter(User.id==user_id).first()
+                if user:
+                    user.password = hashed_password
+                    db.session.commit()
+                    flash("Password changed successfully")
+                    return redirect(url_for('login'))
+            else:
+                flash("Passwords don't match","error")
+    return render_template("password_reset.html",form=form)
 
 
 @app.route('/uploadimg')
@@ -354,6 +386,8 @@ def profile():
 @app.route('/logout')
 def log_out():
     logout_user()
+    session.clear()
+    flash("You've been logged out successfully","success")
     return redirect(url_for('login'))
 
 app.run(debug=True)

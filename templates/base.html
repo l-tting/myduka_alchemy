@@ -124,7 +124,7 @@
 											</p>
 										</a>
 										
-										<a href="/logout" class="sub-menu-link">
+										<a href="/login" class="sub-menu-link">
 											<i class="fa-solid fa-users" style="color: #ef8024;margin-left: 4%;"></i>
 											<p style="margin-top: 0%;font-weight: bolder;color: lightgrey; border-radius: 4%;" >Use a
 												different account
@@ -223,7 +223,7 @@
 	</div>
 	{% endif %}
 	{% if category == 'error' %}
-	<div class="alert alert-danger" role="alert" style="width: 500px; margin-top: 2%;">
+	<div class="alert alert-danger" role="alert" style="width: 500px; margin-top: 0%;">
 		{{message}}
 	</div>
 	{% endif %}
@@ -460,6 +460,9 @@
 		function toggleMenu() {
 			subMenu.classList.toggle("open-menu");
 		}
+	</script>
+	<script>
+
 	</script>
 </body>
 
