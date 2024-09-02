@@ -38,13 +38,7 @@ mail = Mail(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-
-#home
-@app.route('/')
-def home():
-    return render_template('index.html')
-
+#no cache
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
@@ -54,6 +48,13 @@ def nocache(view):
         response.headers['Expires'] = '0'
         return response
     return no_cache
+
+#home
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
 #products
 @app.route('/products')
 @login_required
@@ -66,7 +67,6 @@ def products():
 @app.route('/sales')
 @login_required
 @nocache
-
 def sales():
     products = Product.query.filter_by(user_id=current_user.id)
     sales = Sale.query.filter_by(user_id=current_user.id).all()
@@ -116,6 +116,7 @@ def login():
 #get support
 @app.route('/contact')
 @login_required
+@nocache
 def contact():
     return render_template('contact.html')
 
